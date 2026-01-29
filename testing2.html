@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ärkamisaeg & romantism — Küsimused</title>
+  <style>
+    :root{
+      --bg0:#070610;
+      --bg1:#0c0b1b;
+      --text:#f4f2ff;
+      --muted:#bdb7ff;
+      --faint:#7a73c9;
+      --accent:#a855f7;
+      --accent2:#22d3ee;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.55);
+      --radius: 18px;
+      --radius2: 26px;
+      --focus: 0 0 0 3px rgba(168,85,247,.35), 0 0 0 1px rgba(34,211,238,.25);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(168,85,247,.22), transparent 60%),
+        radial-gradient(900px 600px at 85% 30%, rgba(34,211,238,.18), transparent 55%),
+        radial-gradient(700px 500px at 50% 90%, rgba(251,113,133,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    .wrap{max-width:1120px;margin:0 auto;padding:28px 18px 40px;}
+    header{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px;}
+    .brand{display:flex;gap:14px;align-items:center;}
+    .logo{
+      width:54px;height:54px;border-radius:18px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(34,211,238,.9), transparent 55%),
+        radial-gradient(circle at 70% 70%, rgba(168,85,247,.9), transparent 55%),
+        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
+      box-shadow: var(--shadow); position:relative; overflow:hidden;
+    }
+    .logo:after{
+      content:""; position:absolute; inset:-30px;
+      background: conic-gradient(from 90deg, rgba(168,85,247,.0), rgba(168,85,247,.35), rgba(34,211,238,.28), rgba(168,85,247,.0));
+      animation:spin 9s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    h1{margin:0;font-size:clamp(20px, 3.1vw, 34px);letter-spacing:.2px;line-height:1.15;}
+    .sub{margin-top:6px;color:var(--muted);max-width:76ch;font-size:14px;line-height:1.45;}
+
+    .hud{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;justify-content:flex-end;}
+    .pill{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:999px; padding:10px 12px;
+      display:flex; gap:10px; align-items:center;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+      min-width: 150px;
+    }
+    .pill b{font-family:var(--mono); font-weight:800}
+    .pill .k{color:var(--muted); font-size:12px}
+    .pill .v{font-size:14px}
+    .pill .dot{width:10px;height:10px;border-radius:999px;background: rgba(34,211,238,.8);box-shadow: 0 0 0 3px rgba(34,211,238,.15);}
+    .pill .dot.purple{background: rgba(168,85,247,.9); box-shadow:0 0 0 3px rgba(168,85,247,.18)}
+    .pill .dot.pink{background: rgba(251,113,133,.9); box-shadow:0 0 0 3px rgba(251,113,133,.16)}
+    .progress{width:100%;background: rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:999px;overflow:hidden;height:12px;box-shadow: 0 10px 24px rgba(0,0,0,.35);}
+    .bar{height:100%;width:0%;background: linear-gradient(90deg, var(--accent), var(--accent2));transition: width .5s ease;}
+
+    .grid{display:grid;grid-template-columns: 320px 1fr;gap:16px;margin-top:18px;}
+    @media (max-width: 980px){.grid{grid-template-columns: 1fr}}
+
+    .nav{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius2);
+      padding:14px; box-shadow: var(--shadow);
+      position:sticky; top:16px; height:fit-content;
+      backdrop-filter: blur(10px);
+    }
+    .nav h2{margin: 0 0 10px;font-size: 14px;letter-spacing:.5px;color: var(--muted);text-transform: uppercase;}
+    .nav ol{margin:0;padding-left: 18px;display:flex;flex-direction:column;gap:8px;}
+    .nav button{
+      width:100%; text-align:left; border:none; background: transparent; color: inherit; font: inherit;
+      padding:10px 10px;border-radius: 14px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;
+      transition: transform .08s ease, background .18s ease, border-color .18s ease;
+      border:1px solid transparent;
+    }
+    .nav button:hover{background: rgba(255,255,255,.05); transform: translateY(-1px)}
+    .nav button:focus-visible{outline:none; box-shadow: var(--focus)}
+    .nav .label{display:flex;flex-direction:column;gap:2px;min-width:0}
+    .nav .label .t{font-weight:900;line-height:1.2}
+    .nav .label .s{font-size:12px;color:var(--muted);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width: 220px;}
+    .badge{
+      font-family:var(--mono); font-size:12px; padding:3px 8px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.05);
+      color: var(--text); margin-left:auto; display:inline-flex; align-items:center; gap:6px; flex:0 0 auto;
+      margin-top:2px;
+    }
+    .badge .mini{width:8px;height:8px;border-radius:999px;background: rgba(255,255,255,.35);}
+    .badge.ok .mini{background: rgba(52,211,153,.9)}
+    .badge.lock .mini{background: rgba(251,191,36,.95)}
+    .badge.now .mini{background: rgba(34,211,238,.95)}
+    .badge.ok{border-color: rgba(52,211,153,.35); background: rgba(52,211,153,.08)}
+    .badge.lock{border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.07)}
+    .badge.now{border-color: rgba(34,211,238,.35); background: rgba(34,211,238,.07)}
+    .nav .hint{
+      margin-top:10px; padding:10px 12px; border-radius: 16px;
+      background: rgba(168,85,247,.08); border: 1px dashed rgba(168,85,247,.35);
+      color: var(--muted); font-size: 13px; line-height:1.35;
+    }
+
+    .divider{height:1px;background: rgba(255,255,255,.10);margin: 12px 0;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    button.btn{
+      border:none; cursor:pointer; border-radius: 14px; padding: 10px 14px; font-weight: 900;
+      color: var(--text); background: linear-gradient(90deg, rgba(168,85,247,.95), rgba(34,211,238,.85));
+      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+      transition: transform .08s ease, filter .2s ease;
+    }
+    button.btn:hover{transform: translateY(-1px); filter: brightness(1.06)}
+    button.btn:focus-visible{outline:none; box-shadow: var(--focus)}
+    button.ghost{background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); box-shadow: none; font-weight: 900;}
+    button.ghost:hover{background: rgba(255,255,255,.08)}
+    button.danger{background: rgba(251,113,133,.14); border:1px solid rgba(251,113,133,.35); box-shadow:none;}
+    button.btn:disabled{opacity:.55; cursor:not-allowed; transform:none; filter:none;}
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius2);
+      padding:16px; box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      min-height: 520px;
+    }
+    .stageTitle{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom: 8px;}
+    .stageTitle h2{margin:0;font-size: 20px;}
+    .stageTitle .meta{display:flex; gap:10px; align-items:center; flex-wrap:wrap; color: var(--muted); font-size: 13px;}
+    .chip{padding: 6px 10px;border-radius: 999px;border:1px solid rgba(255,255,255,.12);background: rgba(255,255,255,.05);font-family: var(--mono);font-size:12px;color: var(--text);}
+    .desc{margin: 10px 0 16px;color: var(--muted);line-height: 1.55;max-width: 96ch;font-size: 14px;}
+
+    .cards{display:grid;grid-template-columns: 1fr;gap:12px;}
+    .card{
+      background: linear-gradient(180deg, rgba(18,17,42,.95), rgba(18,17,42,.70));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      padding:14px; box-shadow: 0 14px 38px rgba(0,0,0,.35);
+      position:relative; overflow:hidden;
+    }
+    .card:before{
+      content:""; position:absolute; inset:-120px -160px auto auto;
+      width:240px;height:240px;
+      background: radial-gradient(circle at 30% 30%, rgba(168,85,247,.23), transparent 60%);
+      transform: rotate(18deg); pointer-events:none;
+    }
+    .card h3{margin:0 0 10px;font-size: 16px;letter-spacing:.2px;}
+    .q{margin: 0 0 10px;color: var(--muted);font-size: 14px;line-height:1.4;}
+
+    .readText{
+      color: rgba(245,244,255,.96);
+      font-size: 17px;
+      line-height: 1.8;
+      max-width: 96ch;
+    }
+    .readText b{color: rgba(255,255,255,.98)}
+    .note{color: var(--muted);font-size: 13px;line-height:1.35;}
+
+    .opts{display:grid;gap:8px;margin: 8px 0 0;}
+    label.opt{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 10px; border-radius: 14px;
+      background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+      cursor:pointer; transition: transform .08s ease, background .18s ease; user-select:none;
+    }
+    label.opt:hover{transform: translateY(-1px); background: rgba(255,255,255,.06)}
+    input[type="checkbox"], input[type="radio"]{margin-top: 2px; accent-color: var(--accent2); transform: scale(1.05);}
+
+    select{
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 10px;
+      outline:none;
+      min-width: 220px;
+    }
+    select:focus-visible{box-shadow: var(--focus)}
+    .matchGrid{display:grid;grid-template-columns: 1fr auto;gap:10px;align-items:center;}
+    .matchLeft{
+      padding: 10px 12px;border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);background: rgba(255,255,255,.04);
+      color: var(--text);font-family: var(--mono);font-size: 13px;
+    }
+
+    .feedback{
+      margin-top: 10px; padding: 10px 12px; border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.04);
+      color: var(--muted); display:none;
+    }
+    .feedback.good{border-color: rgba(52,211,153,.35); background: rgba(52,211,153,.07); color: rgba(210,255,238,.92)}
+    .feedback.bad{border-color: rgba(251,113,133,.35); background: rgba(251,113,133,.07); color: rgba(255,221,226,.94)}
+    .feedback.warn{border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.07); color: rgba(255,243,207,.95)}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top: 14px;align-items:center;justify-content:space-between;}
+    .btnRow{display:flex;gap:10px;flex-wrap:wrap;}
+    .footerNote{margin-top: 16px;color: var(--faint);font-size: 12px;line-height: 1.45;}
+
+    /* modal */
+    .modalBack{position:fixed;inset:0;background: rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50;}
+    .modal{
+      max-width: 760px; width:100%; border-radius: 22px;
+      background: linear-gradient(180deg, rgba(18,17,42,.96), rgba(18,17,42,.86));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 30px 90px rgba(0,0,0,.70);
+      padding: 16px; position:relative;
+    }
+    .modal h3{margin:0 0 8px}
+    .modal p{margin:0; color: var(--muted); line-height:1.5}
+    .modal .close{
+      position:absolute; right:12px; top:12px;
+      width:40px; height:40px; border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      cursor:pointer; color: var(--text); font-weight: 900;
+    }
+    .modal .close:hover{background: rgba(255,255,255,.08)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Romantism kui rahvusliku liikumise aeg Eestis</h1>
+        </div>
+      </div>
+
+      <div class="hud" role="status" aria-live="polite">
+        <div class="pill" title="Skoor väheneb vihjete ja valede kontrollimistega.">
+          <span class="dot purple" aria-hidden="true"></span>
+          <div>
+            <div class="k">SKOOR</div>
+            <div class="v"><b id="score">100</b> / 100</div>
+          </div>
+        </div>
+        <div class="pill" title="Kulunud aeg selles sessioonis.">
+          <span class="dot" aria-hidden="true"></span>
+          <div>
+            <div class="k">AEG</div>
+            <div class="v"><b id="timer">00:00</b></div>
+          </div>
+        </div>
+        <div class="pill" title="Vihjete kasutamine (vihje vähendab skoori).">
+          <span class="dot pink" aria-hidden="true"></span>
+          <div>
+            <div class="k">VIHJEID</div>
+            <div class="v"><b id="hintsUsed">0</b></div>
+          </div>
+        </div>
+        
+        <div class="progress" aria-label="Edenemisriba"><div class="bar" id="bar"></div></div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <aside class="nav" aria-label="Plokid">
+        <h2>Plokid</h2>
+        <ol id="stageList"></ol>
+
+        <div class="hint">
+          <b>Flow:</b> Sissejuhatus → Küsimused (4 teemat).
+        </div>
+
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn ghost" id="openHelp">Kuidas see töötab?</button>
+          <button class="btn danger" id="resetAll">Reset</button>
+        </div>
+      </aside>
+
+      <main class="panel" id="panel" tabindex="-1"></main>
+    </div>
+
+    <div class="footerNote">
+      *Progress salvestub automaatselt (localStorage). Reset kustutab salvestuse.*
+      <div id="fbDebugBar" style="margin-top:8px;color:rgba(245,244,255,.75);font-family:var(--mono);font-size:12px">debug: uid=<span id="dbgUid">—</span> • resetVersion=<span id="dbgRv">—</span> • resetSeen=<span id="dbgSeen">—</span></div>
+    </div>
+  </div>
+
+  <div class="modalBack" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal">
+      <button class="close" id="closeHelp" aria-label="Sulge">✕</button>
+      <h3 id="helpTitle">Kuidas see töötab</h3>
+      <p>
+        Vasakul on plokid: <b>sissejuhatus</b> + 4 teema <b>küsimused</b>.
+        Vastad ja vajutad <b>Kontrolli</b> — kui kõik on õige, avaneb järgmine plokk.
+      </p>
+      <div class="divider"></div>
+      <p>
+        Vajadusel kasuta <b>Vihjet</b> (vihje vähendab skoori).
+      </p>
+    </div>
+  </div>
+
+<!-- Firebase SDK (ES Modules) -->
+<script type="module">
+  // Firebase (App + Analytics + Auth + Firestore)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import {
+    getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDC5dL8KQTceIJwIYunG1d3ED2rAsQjoxU",
+    authDomain: "romantism-5c812.firebaseapp.com",
+    projectId: "romantism-5c812",
+    storageBucket: "romantism-5c812.firebasestorage.app",
+    messagingSenderId: "248292294888",
+    appId: "1:248292294888:web:94966a3a28bc23f1f4095d",
+    measurementId: "G-CPCC26JCMW"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+
+  // Auth + Firestore
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Expose for non-module scripts (your main app script below)
+  window.__fb = {
+    app,
+    analytics,
+    auth,
+    db,
+    fs: { doc, setDoc, getDoc, onSnapshot, serverTimestamp }
+  };
+
+  // Sign in anonymously (gives every visitor a stable uid)
+  window.__fbReady = (async () => {
+    try {
+      await signInAnonymously(auth);
+      console.log("[Firebase] Signed in anonymously:", auth.currentUser?.uid);
+    } catch (e) {
+      console.warn("[Firebase] Anonymous sign-in failed (Firestore features disabled):", e);
+    }
+    return window.__fb;
+  })();
+</script>
+
+<script>
+(() => {
+  const TOPICS = [
+    {
+      key: "t1",
+      name: "Rahvuslik liikumine Eestis",
+      tasks: [
+        { type:"singleChoice", id:"t1-q1", title:"Mis aastal toimus I üldlaulupidu?",
+          prompt:"Vali üks.", options:["1869 (Tartu)","1857 (Pärnu)","1878 (Viljandi)"], answer:0,
+          hint:"Mõtle ärkamisaja algusele: see sündmus toimus samal sajandil, kui hakati eestlasi nägema rahvusena. Otsi: „I üldlaulupidu Eesti kus ja millal“."
+        },
+        { type:"match", id:"t1-q2", title:"Sobita ajaleht ja asutaja.",
+          prompt:"Vali iga ajalehe juurde õige inimene.", left:["Perno Postimees","Eesti Postimees","Sakala"],
+          right:["Johann Voldemar Jannsen","Carl Robert Jakobson","Jakob Hurt"],
+          answer:{ "Perno Postimees":"Johann Voldemar Jannsen", "Eesti Postimees":"Johann Voldemar Jannsen", "Sakala":"Carl Robert Jakobson" },
+          hint:"Üks neist meestest oli tuntud kui „laulupeo isa“, teine oli terav poliitiline ärataja. Uuri, kes millise ajalehe kaudu rahvast kõnetas."
+        }
+      ]
+    },
+    {
+      key: "t2",
+      name: "Ajastu inimesed",
+      tasks: [
+        { type:"singleChoice", id:"t2-q1", title:"Kes ütles: „Kui me ei saa suureks … peame suureks saama oma vaimult!“?",
+          prompt:"Vali üks.", options:["Jakob Hurt","Carl Robert Jakobson","Johann Voldemar Jannsen"], answer:0,
+          hint:"See tsitaat pärineb inimeselt, kes kogus rahvaluulet ja rõhutas vaimset suurust. Otsi tsitaadi algust Google’ist."
+        },
+        { type:"singleChoice", id:"t2-q2", title:"Milline leht seostub Carl Robert Jakobsoniga?",
+          prompt:"Vali üks.", options:["Sakala","Eesti Postimees","Perno Postimees"], answer:0,
+          hint:"See ajaleht oli oma ajas kõige võitlevam ja kriitilisem. Otsi: „Carl Robert Jakobson ajaleht“."
+        }
+      ]
+    },
+    {
+      key: "t3",
+      name: "Ajastu pillid",
+      tasks: [
+        { type:"singleChoice", id:"t3-q1", title:"Mis juhtus romantismiajastul orkestriga?",
+          prompt:"Vali üks.", options:["Orkestrikoosseis kasvas ja pille täiustati","Orkester kadus ja alles jäi ainult koor","Muusikas keelati dünaamika kasutamine"],
+          answer:0, hint:"Romantism armastas suuri tundeid ja valju kõla. Mõtle, kas see viis muusika lihtsamaks või hoopis suuremaks."
+        },
+        { type:"singleChoice", id:"t3-q2", title:"Milline instrument oli romantismis eriti oluline (klaveripalad/virtuoossus)?",
+          prompt:"Vali üks.", options:["Klaver","Sitar","Djembe"], answer:0,
+          hint:"See instrument oli 19. sajandil pea igas kodus ja sobis nii virtuoosidele kui ka soolopaladeks. Mõtle Chopini ja Liszti peale."
+        }
+      ]
+    },
+    {
+      key: "t4",
+      name: "Ajastu muusika",
+      tasks: [
+        { type:"singleChoice", id:"t4-q1", title:"Mis on programmiline muusika?",
+          prompt:"Vali üks.",
+          options:["Muusika, mis põhineb kindlal teemal või süžeel (ajalugu/kirjandus/müüdid)","Muusika, mis keelab igasuguse loo ja pealkirja","Ainult trummisoolod ilma meloodiata"],
+          answer:0, hint:"See muusika jutustab loo – vahel ilma sõnadeta. Otsi: „programmiline muusika romantism“."
+        },
+        { type:"singleChoice", id:"t4-q2", title:"Milline žanr seostub romantismis programmilisusega?",
+          prompt:"Vali üks.", options:["Sümfooniline poeem","Keskaja gregooriuse laul","Barokkfuuga kui uus leiutis 1800ndatel"],
+          answer:0, hint:"See žanr sündis just romantismis ja oli tihti inspireeritud kirjandusest või müütidest. Otsi Liszti teoseid."
+        }
+      ]
+    }
+  ];
+
+  const STAGES = [
+    {
+      id:"intro", kind:"read",
+      label:"Sissejuhatus",
+      sub:"Eesmärk",
+      title:"Sissejuhatus",
+      desc:"Eesmärk ja reeglid.",
+      bodyHtml: `
+        <div class="readText">
+          Selle veebitöö eesmärk on kinnistada teema <b>„Romantism kui rahvusliku liikumise aeg Eestis“</b> põhipunkte.
+Vasta küsimustele järjest: kui kõik vastused on õiged, avaneb järgmine teema.
+          
+        </div>
+      `
+    },
+    ...TOPICS.map(t => ({
+      id:`${t.key}_quiz`,
+      kind:"quiz",
+      label:t.name,
+      sub:"Küsimused",
+      title:`${t.name} — küsimused`,
+      desc:"Vasta. Kui kõik on õiged, avaneb järgmine plokk.",
+      tasks:t.tasks
+    })),
+    { id:"final", kind:"final", label:"Lõpp", sub:"Tulemus", title:"Lõpp: Valmis", desc:"Kokkuvõte ja tulemus." }
+  ];
+
+  const STORAGE_KEY = "teemad_escape_questions_v6";
+  const state = {
+    currentStage:"intro",
+    unlocked:new Set(["intro"]),
+    done:new Set(),
+    score:100,
+    hintsUsed:0,
+    checks:0,
+    startTime:Date.now(),
+  };
+
+  const $ = (sel, el=document) => el.querySelector(sel);
+  const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
+  const clamp = (n,a,b) => Math.max(a, Math.min(b,n));
+  const esc = (s) => String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+
+  // --- Firebase helpers (optional) ---
+  function fb(){ return window.__fb || null; }
+  function fbUid(){ return fb()?.auth?.currentUser?.uid || null; }
+
+  function pushProgressToFirestore(){
+    const f = fb();
+    const uid = fbUid();
+    if(!f || !uid) return;
+
+    const doneCount = Array.from(state.done).filter(id => id !== "final").length;
+    const totalStages = STAGES.filter(s => s.id !== "final").length;
+    const pct = Math.round((doneCount / Math.max(1,totalStages)) * 100);
+
+    // fire-and-forget (don’t block UI)
+    f.fs.setDoc(f.fs.doc(f.db, "users", uid), {
+      currentStage: state.currentStage,
+      doneCount,
+      totalStages,
+      pct,
+      score: state.score,
+      hintsUsed: state.hintsUsed,
+      checks: state.checks,
+      updatedAt: f.fs.serverTimestamp(),
+    }, { merge: true }).catch((e) => {
+      console.warn("[Firebase] progress write failed:", e);
+    });
+  }
+
+  function listenGlobalReset(){
+    const f = fb();
+    if(!f) return;
+
+    const globalRef = f.fs.doc(f.db, "settings", "global");
+
+    f.fs.onSnapshot(globalRef, (snap) => {
+      const data = (snap && typeof snap.data === "function") ? snap.data() : null;
+
+      // Allow resetVersion to be number OR string; coerce safely
+      const rvRaw = data?.resetVersion ?? 0;
+      const rv = Number(rvRaw);
+      const rvSafe = Number.isFinite(rv) ? rv : 0;
+
+      const seenRaw = localStorage.getItem("resetSeen");
+      const seenNum = Number(seenRaw ?? "0");
+      const seen = Number.isFinite(seenNum) ? seenNum : 0;
+
+      if(rvSafe > seen){
+        // Important: mark as seen FIRST to avoid any accidental re-entrancy / double-reset
+        localStorage.setItem("resetSeen", String(rvSafe));
+
+        console.log("[Firebase] Global reset detected:", { resetVersion: rvSafe, prevSeen: seen });
+
+        // Now do the local reset
+        reset();
+
+        // Optional: mark that this user has seen the reset (helpful for admin later)
+        const uid = fbUid();
+        if(uid){
+          f.fs.setDoc(f.fs.doc(f.db, "users", uid), {
+            resetSeen: rvSafe,
+            updatedAt: f.fs.serverTimestamp(),
+          }, { merge: true }).catch(() => {});
+        }
+      }
+    }, (err) => {
+      console.warn("[Firebase] reset listener error:", err);
+    });
+  }
+
+
+  function stageById(id){ return STAGES.find(s => s.id === id); }
+  function stageIndex(id){ return STAGES.findIndex(s => s.id === id); }
+  function nextStageId(id){ const i = stageIndex(id); return STAGES[i+1] ? STAGES[i+1].id : null; }
+
+  function setScore(delta){
+    state.score = clamp(state.score + delta, 0, 100);
+    $("#score").textContent = state.score;
+  }
+  function updateBar(){
+    const countable = STAGES.filter(s => s.id !== "final").length;
+    const doneCount = Array.from(state.done).filter(id => id !== "final").length;
+    const pct = Math.round((doneCount / countable) * 100);
+    $("#bar").style.width = `${pct}%`;
+  }
+
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      currentStage: state.currentStage,
+      unlocked: Array.from(state.unlocked),
+      done: Array.from(state.done),
+      score: state.score,
+      hintsUsed: state.hintsUsed,
+      checks: state.checks,
+      startTime: state.startTime
+    }));
+    pushProgressToFirestore();
+  }
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      const p = JSON.parse(raw);
+      state.currentStage = p.currentStage || state.currentStage;
+      state.unlocked = new Set(p.unlocked || Array.from(state.unlocked));
+      state.done = new Set(p.done || []);
+      state.score = typeof p.score === "number" ? p.score : state.score;
+      state.hintsUsed = typeof p.hintsUsed === "number" ? p.hintsUsed : state.hintsUsed;
+      state.checks = typeof p.checks === "number" ? p.checks : state.checks;
+      state.startTime = typeof p.startTime === "number" ? p.startTime : Date.now();
+    }catch(e){}
+  }
+  function reset(){
+    localStorage.removeItem(STORAGE_KEY);
+    state.currentStage="intro";
+    state.unlocked=new Set(["intro"]);
+    state.done=new Set();
+    state.score=100;
+    state.hintsUsed=0;
+    state.checks=0;
+    state.startTime=Date.now();
+    renderAll();
+    pushProgressToFirestore();
+  }
+
+  function renderNav(){
+    const ol = $("#stageList");
+    ol.innerHTML = "";
+    STAGES.forEach(st => {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+
+      const isUnlocked = state.unlocked.has(st.id);
+      const isDone = state.done.has(st.id);
+      const isCurrent = state.currentStage === st.id;
+
+      btn.disabled = !isUnlocked;
+      btn.style.opacity = isUnlocked ? "1" : ".55";
+      btn.style.cursor = isUnlocked ? "pointer" : "not-allowed";
+
+      btn.innerHTML = `
+        <div class="label">
+          <div class="t">${esc(st.label)}</div>
+          <div class="s">${esc(st.sub || "")}</div>
+        </div>
+        <span class="badge ${isDone ? "ok" : isCurrent ? "now" : isUnlocked ? "" : "lock"}">
+          <span class="mini" aria-hidden="true"></span>
+          <span>${isDone ? "OK" : isCurrent ? "SIIN" : isUnlocked ? "AVATUD" : "LUKUS"}</span>
+        </span>
+      `;
+
+      btn.addEventListener("click", () => {
+        if(!state.unlocked.has(st.id)) return;
+        state.currentStage = st.id;
+        save();
+        renderAll();
+        $("#panel").focus({preventScroll:false});
+      });
+
+      li.appendChild(btn);
+      ol.appendChild(li);
+    });
+  }
+
+  function renderTask(task){
+    const card = document.createElement("section");
+    card.className = "card";
+    card.dataset.task = task.id;
+
+    card.innerHTML = `
+      <h3>${esc(task.title)}</h3>
+      <div class="q">${esc(task.prompt)}</div>
+    `;
+
+    if(task.type === "singleChoice" || task.type === "multiSelect"){
+      const opts = document.createElement("div");
+      opts.className = "opts";
+      const name = task.id;
+
+      task.options.forEach((txt, i) => {
+        const lab = document.createElement("label");
+        lab.className = "opt";
+
+        const input = document.createElement("input");
+        input.type = task.type === "singleChoice" ? "radio" : "checkbox";
+        input.name = name;
+        input.value = String(i);
+
+        const span = document.createElement("div");
+        span.innerHTML = `<div style="font-weight:900">${esc(txt)}</div>`;
+
+        lab.appendChild(input);
+        lab.appendChild(span);
+        opts.appendChild(lab);
+      });
+
+      card.appendChild(opts);
+    }
+
+    if(task.type === "match"){
+      const wrap = document.createElement("div");
+      wrap.className = "opts";
+      wrap.style.marginTop = "10px";
+
+      task.left.forEach(lft => {
+        const row = document.createElement("div");
+        row.className = "matchGrid";
+
+        const left = document.createElement("div");
+        left.className = "matchLeft";
+        left.textContent = lft;
+
+        const sel = document.createElement("select");
+        sel.dataset.left = lft;
+        sel.innerHTML = `<option value="">— vali —</option>` + task.right
+          .map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join("");
+
+        row.appendChild(left);
+        row.appendChild(sel);
+        wrap.appendChild(row);
+      });
+
+      card.appendChild(wrap);
+    }
+
+    const fb = document.createElement("div");
+    fb.className = "feedback";
+    fb.id = `fb-${task.id}`;
+    card.appendChild(fb);
+
+    return card;
+  }
+
+  function getTaskUserAnswer(task, root){
+    const card = root.querySelector(`[data-task="${task.id}"]`);
+    if(!card) return null;
+
+    if(task.type === "singleChoice"){
+      const chosen = card.querySelector(`input[type="radio"]:checked`);
+      return chosen ? Number(chosen.value) : null;
+    }
+    if(task.type === "multiSelect"){
+      return $$( `input[type="checkbox"]:checked`, card).map(x => Number(x.value)).sort((a,b)=>a-b);
+    }
+    if(task.type === "match"){
+      const out = {};
+      $$("select", card).forEach(sel => out[sel.dataset.left] = sel.value || "");
+      return out;
+    }
+    return null;
+  }
+
+  function isTaskCorrect(task, ans){
+    if(task.type === "singleChoice") return ans === task.answer;
+    if(task.type === "multiSelect"){
+      if(!Array.isArray(ans)) return false;
+      const a = [...task.answer].sort((x,y)=>x-y);
+      return JSON.stringify(ans) === JSON.stringify(a);
+    }
+    if(task.type === "match"){
+      if(!ans || typeof ans !== "object") return false;
+      return Object.keys(task.answer).every(k => ans[k] === task.answer[k]);
+    }
+    return false;
+  }
+
+  function showFeedback(taskId, kind, msg){
+    const fb = document.getElementById(`fb-${taskId}`);
+    fb.className = `feedback ${kind}`;
+    fb.textContent = msg;
+    fb.style.display = "block";
+  }
+
+  function renderStage(stageId){
+    const st = stageById(stageId);
+    const panel = $("#panel");
+    panel.innerHTML = "";
+
+    const head = document.createElement("div");
+    head.className = "stageTitle";
+
+    const idx = stageIndex(stageId) + 1;
+    head.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:4px">
+        <h2>${esc(st.title)}</h2>
+        <div class="meta">
+          <span class="chip">plokk: <b class="mono">${idx}</b> / <b class="mono">${STAGES.length}</b></span>
+          <span class="chip">tüüp: <b class="mono">${esc(st.kind)}</b></span>
+          <span class="chip">staatus: <b class="mono">${state.done.has(stageId) ? "OK" : "tegemata"}</b></span>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn ghost" id="hintBtn" ${st.kind !== "quiz" ? "disabled" : ""}>Vihje</button>
+        <button class="btn" id="mainBtn">${st.kind === "quiz" ? "Kontrolli" : (st.kind === "final" ? "Mängi uuesti" : "Alusta")}</button>
+      </div>
+    `;
+
+    const desc = document.createElement("div");
+    desc.className = "desc";
+    desc.textContent = st.desc || "";
+    panel.appendChild(head);
+    panel.appendChild(desc);
+
+    const cards = document.createElement("div");
+    cards.className = "cards";
+    panel.appendChild(cards);
+
+    if(st.kind === "read"){
+      const card = document.createElement("section");
+      card.className = "card";
+      card.innerHTML = `
+        <h3>${esc(st.sub || "Info")}</h3>
+        ${st.bodyHtml || ""}
+        <div class="divider"></div>
+        <div class="note">Vajuta <b>Alusta</b>, et avada esimese teema küsimused.</div>
+      `;
+      cards.appendChild(card);
+
+      $("#mainBtn").addEventListener("click", () => {
+        state.done.add(st.id);
+        const nextId = nextStageId(st.id);
+        if(nextId) state.unlocked.add(nextId);
+        save();
+        renderNav();
+        updateBar();
+        if(nextId){
+          state.currentStage = nextId;
+          save();
+          renderAll();
+          $("#panel").focus({preventScroll:false});
+        }
+      });
+
+      renderPrevNext(panel, st.id);
+      return;
+    }
+
+    if(st.kind === "quiz"){
+      (st.tasks || []).forEach(task => cards.appendChild(renderTask(task)));
+
+      const info = document.createElement("section");
+      info.className = "card";
+      info.innerHTML = `
+        <h3>Edasi liikumine</h3>
+        <div class="desc">Kui kõik vastused on õiged, avaneb järgmine teema.</div>
+        <div class="note" id="quizNote">Vasta ja vajuta <b>Kontrolli</b>.</div>
+      `;
+      cards.appendChild(info);
+
+      $("#mainBtn").addEventListener("click", () => checkQuiz(st));
+      $("#hintBtn").addEventListener("click", () => useHint(st));
+
+      renderPrevNext(panel, st.id);
+      return;
+    }
+
+    // final
+    cards.appendChild(renderFinalCard());
+    $("#mainBtn").addEventListener("click", reset);
+    renderPrevNext(panel, st.id);
+  }
+
+  function renderPrevNext(panel, stageId){
+    const prevId = STAGES[stageIndex(stageId) - 1]?.id || null;
+    const nextId = nextStageId(stageId);
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    actions.innerHTML = `
+      <div class="btnRow">
+        <button class="btn ghost" id="prevStage" ${prevId ? "" : "disabled"}>← Eelmine plokk</button>
+        <button class="btn ghost" id="nextStage" ${nextId && state.unlocked.has(nextId) ? "" : "disabled"}>Järgmine plokk →</button>
+      </div>
+      <div class="note">${noteTextFor(stageId)}</div>
+    `;
+    panel.appendChild(actions);
+
+    $("#prevStage")?.addEventListener("click", () => {
+      if(!prevId) return;
+      state.currentStage = prevId;
+      save();
+      renderAll();
+    });
+
+    $("#nextStage")?.addEventListener("click", () => {
+      if(!nextId) return;
+      if(!state.unlocked.has(nextId)) return;
+      state.currentStage = nextId;
+      save();
+      renderAll();
+    });
+  }
+
+  function noteTextFor(stageId){
+    const st = stageById(stageId);
+    if(st.kind === "read") return "Sissejuhatus: vajuta “Alusta”, et liikuda küsimustesse.";
+    if(st.kind === "quiz") return state.done.has(stageId) ? "Plokk tehtud! Võid minna järgmisse plokki." : "Lahenda kõik küsimused, et järgmine plokk avaneks.";
+    if(st.kind === "final") return "Valmis!";
+    return "";
+  }
+
+  function checkQuiz(stage){
+    state.checks += 1;
+    if(state.checks > 1) setScore(-1);
+
+    const panel = $("#panel");
+    let allCorrect = true;
+    let unanswered = 0;
+
+    (stage.tasks || []).forEach(task => {
+      const ans = getTaskUserAnswer(task, panel);
+
+      if(task.type === "singleChoice" && ans === null) unanswered++;
+      if(task.type === "multiSelect" && Array.isArray(ans) && ans.length === 0) unanswered++;
+      if(task.type === "match"){
+        const keys = Object.keys(task.answer);
+        if(keys.some(k => !ans[k])) unanswered++;
+      }
+
+      const ok = isTaskCorrect(task, ans);
+      if(ok) showFeedback(task.id, "good", "Õige ✅");
+      else{
+        allCorrect = false;
+        showFeedback(task.id, unanswered ? "warn" : "bad",
+          unanswered ? "Täida vastus(ed) ja proovi uuesti." : "Pole päris. Proovi uuesti või kasuta vihjet.");
+      }
+    });
+
+    if(!allCorrect) setScore(-2);
+
+    const qn = $("#quizNote");
+    if(allCorrect){
+      state.done.add(stage.id);
+      const nextId = nextStageId(stage.id);
+      if(nextId) state.unlocked.add(nextId);
+
+      const allBeforeFinal = STAGES.filter(s => s.id !== "final").every(s => state.done.has(s.id));
+      if(allBeforeFinal) state.unlocked.add("final");
+
+      save();
+      renderNav();
+      updateBar();
+
+      if(qn) qn.textContent = "🎉 Kõik õige! Järgmine plokk on avatud.";
+      const nextBtn = $("#nextStage");
+      if(nextBtn && nextId && state.unlocked.has(nextId)) nextBtn.disabled = false;
+    }else{
+      if(qn) qn.textContent = unanswered ? "Täida kõik vastused ja proovi uuesti." : "Proovi uuesti või kasuta vihjet.";
+    }
+  }
+
+  function useHint(stage){
+    let shown = false;
+
+    for(const task of (stage.tasks || [])){
+      const fb = document.getElementById(`fb-${task.id}`);
+      const hinted = fb?.dataset?.hinted === "1";
+      if(hinted) continue;
+
+      showFeedback(task.id, "warn", `Vihje 💡 ${task.hint}`);
+      fb.dataset.hinted = "1";
+      shown = true;
+      break;
+    }
+
+    if(!shown){
+      alert("Selles plokis on kõik vihjed juba näidatud 🙂");
+      return;
+    }
+
+    state.hintsUsed += 1;
+    $("#hintsUsed").textContent = state.hintsUsed;
+    setScore(-3);
+    save();
+  }
+
+  function renderFinalCard(){
+    const card = document.createElement("section");
+    card.className = "card";
+    const seconds = (Date.now() - state.startTime)/1000;
+
+    card.innerHTML = `
+      <h3>Tulemus</h3>
+      <div class="q">Skoor: <b class="mono">${state.score}</b> / 100</div>
+      <div class="q">Vihjeid: <b class="mono">${state.hintsUsed}</b></div>
+      <div class="q">Aeg: <b class="mono">${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(Math.floor(seconds%60)).padStart(2,'0')}</b></div>
+      <div class="divider"></div>
+      <div class="note">Vajuta ülal “Mängi uuesti”, kui tahad nullist alustada.</div>
+    `;
+    return card;
+  }
+
+  // modal
+  function openHelp(){ $("#helpModal").style.display = "flex"; $("#closeHelp").focus(); }
+  function closeHelp(){ $("#helpModal").style.display = "none"; $("#openHelp").focus(); }
+  $("#openHelp").addEventListener("click", openHelp);
+  $("#closeHelp").addEventListener("click", closeHelp);
+  $("#helpModal").addEventListener("click", (e) => { if(e.target.id === "helpModal") closeHelp(); });
+  document.addEventListener("keydown", (e) => { if(e.key === "Escape" && $("#helpModal").style.display === "flex") closeHelp(); });
+
+  $("#resetAll").addEventListener("click", () => {
+    const ok = confirm("Kas resetid kogu progressi? (Skoor, lukud ja lahendused nullitakse)");
+    if(ok) reset();
+  });
+
+  // init
+  load();
+  state.unlocked.add("intro");
+
+  // When Firebase is ready, start listening for global reset and push current progress
+  if(window.__fbReady && typeof window.__fbReady.then === "function"){
+    window.__fbReady.then(() => {
+      console.log("[Firebase] __fbReady OK — starting reset listener");
+      listenGlobalReset();
+      pushProgressToFirestore();
+    });
+  }
+
+  if(!stageById(state.currentStage) || !state.unlocked.has(state.currentStage)){
+    state.currentStage = "intro";
+  }
+
+  const allBeforeFinal = STAGES.filter(s => s.id !== "final").every(s => state.done.has(s.id));
+  if(allBeforeFinal) state.unlocked.add("final");
+
+  function renderAll(){
+    renderNav();
+    renderStage(state.currentStage);
+    $("#score").textContent = state.score;
+    $("#hintsUsed").textContent = state.hintsUsed;
+    updateBar();
+  }
+  function tick(){
+    const sec = (Date.now() - state.startTime)/1000;
+    $("#timer").textContent = `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(Math.floor(sec%60)).padStart(2,'0')}`;
+    requestAnimationFrame(tick);
+  }
+
+  renderAll();
+  tick();
+})();
+</script>
+</body>
+</html>
