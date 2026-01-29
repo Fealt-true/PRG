@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Romantism — Admin / Management</title>
+  <style>
+    :root{
+      --bg0:#070610; --bg1:#0c0b1b;
+      --text:#f4f2ff; --muted:#bdb7ff; --faint:#7a73c9;
+      --accent:#a855f7; --accent2:#22d3ee;
+      --good:#34d399; --warn:#fbbf24; --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.55);
+      --radius: 18px; --radius2: 26px;
+      --focus: 0 0 0 3px rgba(168,85,247,.35), 0 0 0 1px rgba(34,211,238,.25);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(168,85,247,.22), transparent 60%),
+        radial-gradient(900px 600px at 85% 30%, rgba(34,211,238,.18), transparent 55%),
+        radial-gradient(700px 500px at 50% 90%, rgba(251,113,133,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    .wrap{max-width:1180px;margin:0 auto;padding:26px 18px 40px;}
+    header{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px;}
+    .brand{display:flex;gap:12px;align-items:center;}
+    .logo{
+      width:44px;height:44px;border-radius:16px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(34,211,238,.9), transparent 55%),
+        radial-gradient(circle at 70% 70%, rgba(168,85,247,.9), transparent 55%),
+        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
+      box-shadow: var(--shadow);
+    }
+    h1{margin:0;font-size:20px;letter-spacing:.2px;line-height:1.15;}
+    .sub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.45;max-width:80ch}
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius2);
+      padding:16px; box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill{
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;
+      padding:10px 12px;
+      display:flex; gap:10px; align-items:center;
+      box-shadow: 0 10px 30px rgba(0,0,0,.30);
+    }
+    .pill .k{color:var(--muted); font-size:12px}
+    .pill .v{font-family:var(--mono); font-weight:800}
+    .btn{
+      border:none; cursor:pointer; border-radius: 14px; padding: 10px 14px; font-weight: 900;
+      color: var(--text); background: linear-gradient(90deg, rgba(168,85,247,.95), rgba(34,211,238,.85));
+      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+      transition: transform .08s ease, filter .2s ease;
+    }
+    .btn:hover{transform: translateY(-1px); filter: brightness(1.06)}
+    .btn:focus-visible{outline:none; box-shadow: var(--focus)}
+    .btn.ghost{background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); box-shadow: none;}
+    .btn.danger{background: rgba(251,113,133,.14); border:1px solid rgba(251,113,133,.35); box-shadow:none;}
+    .btn:disabled{opacity:.55; cursor:not-allowed; transform:none; filter:none;}
+
+    .grid{display:grid;grid-template-columns: 360px 1fr;gap:16px;margin-top:16px;}
+    @media (max-width: 980px){.grid{grid-template-columns: 1fr}}
+
+    .card{
+      background: linear-gradient(180deg, rgba(18,17,42,.95), rgba(18,17,42,.70));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      padding:14px; box-shadow: 0 14px 38px rgba(0,0,0,.35);
+    }
+    .card h2{margin:0 0 8px;font-size:16px}
+    .card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+
+    label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
+    input{
+      width:100%;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 10px;
+      outline:none;
+    }
+    input:focus{box-shadow: var(--focus)}
+    .mono{font-family:var(--mono)}
+    .hint{color:var(--faint);font-size:12px;line-height:1.45;margin-top:10px}
+
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    th{
+      text-align:left;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:800;
+      padding:0 10px 6px;
+    }
+    td{
+      padding:10px;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-left:none;border-right:none;
+      font-size:13px;
+    }
+    tr td:first-child{
+      border-left:1px solid rgba(255,255,255,.08);
+      border-top-left-radius:14px;border-bottom-left-radius:14px;
+    }
+    tr td:last-child{
+      border-right:1px solid rgba(255,255,255,.08);
+      border-top-right-radius:14px;border-bottom-right-radius:14px;
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 8px;border-radius:999px;
+      font-family:var(--mono);font-size:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      white-space:nowrap;
+    }
+    .dot{width:8px;height:8px;border-radius:999px;background: rgba(255,255,255,.35)}
+    .ok .dot{background: rgba(52,211,153,.9)}
+    .now .dot{background: rgba(34,211,238,.95)}
+    .warn .dot{background: rgba(251,191,36,.95)}
+    .bad .dot{background: rgba(251,113,133,.95)}
+    .right{margin-left:auto}
+    .small{font-size:12px;color:var(--muted)}
+    .toast{
+      margin-top:10px;
+      padding:10px 12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      display:none;
+    }
+    .toast.good{border-color: rgba(52,211,153,.35); background: rgba(52,211,153,.07); color: rgba(210,255,238,.92)}
+    .toast.bad{border-color: rgba(251,113,133,.35); background: rgba(251,113,133,.07); color: rgba(255,221,226,.94)}
+    .divider{height:1px;background: rgba(255,255,255,.10);margin: 12px 0;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Romantism — Admin / Management</h1>
+          <div class="sub">
+            Näed kasutajate progressi (Firestore <span class="mono">users</span> collection) ja saad teha “Reset all”
+            (tõstab <span class="mono">settings/global.resetVersion</span>).
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="pill" title="Firestore users dokumentide arv (reaalajas)">
+          <div>
+            <div class="k">KASUTAJAID</div>
+            <div class="v" id="userCount">—</div>
+          </div>
+        </div>
+        <div class="pill" title="Aktiivne viimase 24h jooksul (updatedAt)">
+          <div>
+            <div class="k">AKTIIVSED 24h</div>
+            <div class="v" id="active24h">—</div>
+          </div>
+        </div>
+        <button class="btn ghost" id="signOutBtn" disabled>Logi välja</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <aside class="panel">
+        <div class="card">
+          <h2>Sisselogimine</h2>
+          <p>Soovitus: lülita Firebase Authentication’is sisse <b>Email/Password</b> ja tee endale admin kasutaja.</p>
+
+          <div id="loginBox">
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="admin@..." autocomplete="username" />
+            <label for="password">Parool</label>
+            <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+            <div class="row" style="margin-top:12px">
+              <button class="btn" id="loginBtn">Logi sisse</button>
+              <button class="btn ghost" id="anonBtn" title="Ainult testimiseks! Admin leht jääb muidu avalikuks.">Anon test-login</button>
+            </div>
+            <div class="hint">
+              <b>NB!</b> Kui sa hostid seda GitHub Pages’is, on see leht avalik. Õige turvalisus tuleb Firestore reeglitest (alla “Soovituslikud reeglid”).
+            </div>
+          </div>
+
+          <div id="whoami" class="toast good"></div>
+          <div id="toast" class="toast"></div>
+
+          <div class="divider"></div>
+
+          <h2>Reset all</h2>
+          <p>
+            See ei kustuta dokumente. See suurendab <span class="mono">resetVersion</span>-it ja kliendid teevad ise reseti.
+          </p>
+          <div class="row" style="margin-top:12px">
+            <button class="btn danger" id="resetAllBtn" disabled>Reset kõigile</button>
+            <span class="small" id="resetVersionLabel">resetVersion: —</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <h2>Soovituslikud Firestore reeglid</h2>
+          <p class="small">
+            Pane need Firebase Console → Firestore → Rules. Asenda <span class="mono">ADMIN_UID</span> oma kasutaja UID-ga.
+          </p>
+          <pre class="mono" style="white-space:pre-wrap;margin:10px 0 0;color:rgba(245,244,255,.92);font-size:12px;line-height:1.45;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px;">
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{uid} {
+      allow read: if request.auth != null; // või piirata adminile
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /settings/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == "ADMIN_UID";
+    }
+  }
+}</pre>
+        </div>
+      </aside>
+
+      <main class="panel">
+        <div class="card">
+          <div class="row">
+            <div>
+              <h2>Kasutajad</h2>
+              <p>Reaalajas list. “Kaugel” = % (doneCount / totalStages) ja currentStage.</p>
+            </div>
+            <div class="right row">
+              <button class="btn ghost" id="refreshBtn" disabled>Uuenda</button>
+            </div>
+          </div>
+
+          <div style="overflow:auto;margin-top:10px">
+            <table>
+              <thead>
+                <tr>
+                  <th>UID</th>
+                  <th>Progress</th>
+                  <th>Plokk</th>
+                  <th>Skoor</th>
+                  <th>Vihjed</th>
+                  <th>Viimati aktiivne</th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr><td colspan="6" class="small">Logi sisse, et näha kasutajaid.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="hint" id="hintBottom"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import {
+    getFirestore, collection, query, orderBy, onSnapshot,
+    doc, runTransaction, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDC5dL8KQTceIJwIYunG1d3ED2rAsQjoxU",
+    authDomain: "romantism-5c812.firebaseapp.com",
+    projectId: "romantism-5c812",
+    storageBucket: "romantism-5c812.firebasestorage.app",
+    messagingSenderId: "248292294888",
+    appId: "1:248292294888:web:94966a3a28bc23f1f4095d",
+    measurementId: "G-CPCC26JCMW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const $ = (s, el=document) => el.querySelector(s);
+  const fmtTime = (ts) => {
+    if(!ts) return "—";
+    try{
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleString();
+    }catch(e){ return "—"; }
+  };
+  function toast(kind, msg){
+    const t = $("#toast");
+    t.className = "toast " + (kind || "");
+    t.textContent = msg;
+    t.style.display = "block";
+    setTimeout(() => { t.style.display = "none"; }, 4500);
+  }
+  function whoami(msg){
+    const w = $("#whoami");
+    w.className = "toast good";
+    w.textContent = msg;
+    w.style.display = "block";
+  }
+
+  const globalRef = doc(db, "settings", "global");
+  onSnapshot(globalRef, (snap) => {
+    const rv = snap.data()?.resetVersion ?? 0;
+    $("#resetVersionLabel").textContent = "resetVersion: " + rv;
+  });
+
+  let unsubUsers = null;
+
+  function renderUsers(rows){
+    const tbody = $("#tbody");
+    tbody.innerHTML = "";
+    if(rows.length === 0){
+      tbody.innerHTML = `<tr><td colspan="6" class="small">Pole veel ühtegi kasutajat (või pole keegi veel salvestanud).</td></tr>`;
+      $("#userCount").textContent = "0";
+      $("#active24h").textContent = "0";
+      return;
+    }
+
+    $("#userCount").textContent = String(rows.length);
+    const now = Date.now();
+    const active = rows.filter(r => {
+      const ts = r.updatedAt?.toDate ? r.updatedAt.toDate().getTime() : 0;
+      return ts && (now - ts) <= 24*60*60*1000;
+    }).length;
+    $("#active24h").textContent = String(active);
+
+    for(const r of rows){
+      const pct = (typeof r.pct === "number") ? r.pct : null;
+      const doneCount = (typeof r.doneCount === "number") ? r.doneCount : null;
+      const total = (typeof r.totalStages === "number") ? r.totalStages : null;
+
+      let badgeClass = "warn";
+      if(pct === 100) badgeClass = "ok";
+      else if(pct !== null && pct >= 60) badgeClass = "now";
+      else if(pct !== null && pct < 20) badgeClass = "bad";
+
+      const progressText =
+        pct === null ? "—" :
+        `${pct}%` + (doneCount !== null && total !== null ? ` (${doneCount}/${total})` : "");
+
+      const uidShort = r.uid.length > 10 ? (r.uid.slice(0,6) + "…" + r.uid.slice(-4)) : r.uid;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td title="${r.uid}" class="mono">${uidShort}</td>
+        <td><span class="badge ${badgeClass}"><span class="dot"></span>${progressText}</span></td>
+        <td class="mono">${r.currentStage || "—"}</td>
+        <td class="mono">${(typeof r.score === "number") ? r.score : "—"}</td>
+        <td class="mono">${(typeof r.hintsUsed === "number") ? r.hintsUsed : "—"}</td>
+        <td>${fmtTime(r.updatedAt)}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  function subscribeUsers(){
+    if(unsubUsers) unsubUsers();
+    const q = query(collection(db, "users"), orderBy("updatedAt", "desc"));
+    unsubUsers = onSnapshot(q, (snap) => {
+      const rows = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+      renderUsers(rows);
+      $("#hintBottom").textContent = `Kokku ${rows.length} kasutajat. (Uuendub reaalajas.)`;
+    }, (err) => {
+      console.error(err);
+      toast("bad", "Ei saanud users collectionit lugeda. Kontrolli Firestore Rules / Auth.");
+      $("#tbody").innerHTML = `<tr><td colspan="6" class="small">Viga: puudub ligipääs users andmetele. Vaata Console'i.</td></tr>`;
+    });
+  }
+
+  async function doResetAll(){
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(globalRef);
+      const current = snap.exists() ? (snap.data().resetVersion ?? 0) : 0;
+      tx.set(globalRef, { resetVersion: current + 1, updatedAt: serverTimestamp() }, { merge: true });
+    });
+    toast("good", "ResetVersion suurendatud. Kliendid resetivad ennast automaatselt.");
+  }
+
+  $("#loginBtn").addEventListener("click", async () => {
+    const email = $("#email").value.trim();
+    const pass = $("#password").value;
+    try{
+      await signInWithEmailAndPassword(auth, email, pass);
+      toast("good", "Sisselogitud.");
+    }catch(e){
+      console.error(e);
+      toast("bad", e?.message || "Sisselogimine ebaõnnestus.");
+    }
+  });
+
+  $("#anonBtn").addEventListener("click", async () => {
+    try{
+      await signInAnonymously(auth);
+      toast("good", "Anon test-login tehtud.");
+    }catch(e){
+      console.error(e);
+      toast("bad", e?.message || "Anon login ebaõnnestus.");
+    }
+  });
+
+  $("#signOutBtn").addEventListener("click", async () => {
+    try{ await signOut(auth); }catch(e){ console.error(e); }
+  });
+
+  $("#resetAllBtn").addEventListener("click", async () => {
+    const ok = confirm("Kas teed reseti KÕIGILE kasutajatele? (See tõstab resetVersionit)");
+    if(!ok) return;
+    try{
+      $("#resetAllBtn").disabled = true;
+      await doResetAll();
+    }catch(e){
+      console.error(e);
+      toast("bad", e?.message || "Reset ebaõnnestus. Kontrolli õiguseid.");
+    }finally{
+      $("#resetAllBtn").disabled = false;
+    }
+  });
+
+  $("#refreshBtn").addEventListener("click", () => subscribeUsers());
+
+  onAuthStateChanged(auth, (user) => {
+    const loggedIn = !!user;
+    $("#signOutBtn").disabled = !loggedIn;
+    $("#resetAllBtn").disabled = !loggedIn;
+    $("#refreshBtn").disabled = !loggedIn;
+
+    if(!loggedIn){
+      whoami("Pole sisse logitud.");
+      $("#tbody").innerHTML = `<tr><td colspan="6" class="small">Logi sisse, et näha kasutajaid.</td></tr>`;
+      $("#userCount").textContent = "—";
+      $("#active24h").textContent = "—";
+      if(unsubUsers){ unsubUsers(); unsubUsers = null; }
+      return;
+    }
+
+    whoami(`Sisse logitud UID: ${user.uid}`);
+    subscribeUsers();
+  });
+</script>
+</body>
+</html>
