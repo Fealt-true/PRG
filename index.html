@@ -498,26 +498,39 @@ Vasta küsimustele järjest: kui kõik vastused on õiged, avaneb järgmine teem
 
   function listenGlobalReset(){
     const f = fb();
-    const uid = fbUid();
-    if(!f || !uid) return;
+    if(!f) return;
 
     const globalRef = f.fs.doc(f.db, "settings", "global");
 
     f.fs.onSnapshot(globalRef, (snap) => {
-      const data = snap.data ? snap.data() : null;
-      const rv = (data && typeof data.resetVersion === "number") ? data.resetVersion : 0;
+      const data = (snap && typeof snap.data === "function") ? snap.data() : null;
 
-      const seen = Number(localStorage.getItem("resetSeen") || "0");
-      if(rv > seen){
-        // global reset triggered
+      // Allow resetVersion to be number OR string; coerce safely
+      const rvRaw = data?.resetVersion ?? 0;
+      const rv = Number(rvRaw);
+      const rvSafe = Number.isFinite(rv) ? rv : 0;
+
+      const seenRaw = localStorage.getItem("resetSeen");
+      const seenNum = Number(seenRaw ?? "0");
+      const seen = Number.isFinite(seenNum) ? seenNum : 0;
+
+      if(rvSafe > seen){
+        // Important: mark as seen FIRST to avoid any accidental re-entrancy / double-reset
+        localStorage.setItem("resetSeen", String(rvSafe));
+
+        console.log("[Firebase] Global reset detected:", { resetVersion: rvSafe, prevSeen: seen });
+
+        // Now do the local reset
         reset();
-        localStorage.setItem("resetSeen", String(rv));
 
-        // mark that this user has seen the reset (helpful for admin later)
-        f.fs.setDoc(f.fs.doc(f.db, "users", uid), {
-          resetSeen: rv,
-          updatedAt: f.fs.serverTimestamp(),
-        }, { merge: true }).catch(() => {});
+        // Optional: mark that this user has seen the reset (helpful for admin later)
+        const uid = fbUid();
+        if(uid){
+          f.fs.setDoc(f.fs.doc(f.db, "users", uid), {
+            resetSeen: rvSafe,
+            updatedAt: f.fs.serverTimestamp(),
+          }, { merge: true }).catch(() => {});
+        }
       }
     }, (err) => {
       console.warn("[Firebase] reset listener error:", err);
@@ -967,6 +980,7 @@ Vasta küsimustele järjest: kui kõik vastused on õiged, avaneb järgmine teem
   // When Firebase is ready, start listening for global reset and push current progress
   if(window.__fbReady && typeof window.__fbReady.then === "function"){
     window.__fbReady.then(() => {
+      console.log("[Firebase] __fbReady OK — starting reset listener");
       listenGlobalReset();
       pushProgressToFirestore();
     });
