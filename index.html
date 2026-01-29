@@ -25,6 +25,27 @@
     }
     *{box-sizing:border-box}
     html,body{height:100%}
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDC5dL8KQTceIJwIYunG1d3ED2rAsQjoxU",
+  authDomain: "romantism-5c812.firebaseapp.com",
+  projectId: "romantism-5c812",
+  storageBucket: "romantism-5c812.firebasestorage.app",
+  messagingSenderId: "248292294888",
+  appId: "1:248292294888:web:94966a3a28bc23f1f4095d",
+  measurementId: "G-CPCC26JCMW"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
     body{
       margin:0;
       font-family:var(--sans);
@@ -266,7 +287,7 @@
             <div class="v"><b id="hintsUsed">0</b></div>
           </div>
         </div>
-        <div style="flex:1 1 100%;"></div>
+        
         <div class="progress" aria-label="Edenemisriba"><div class="bar" id="bar"></div></div>
       </div>
     </header>
