@@ -312,9 +312,13 @@
 
 <!-- Firebase SDK (ES Modules) -->
 <script type="module">
-  // Import the functions you need from the SDKs you need
+  // Firebase (App + Analytics + Auth + Firestore)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import {
+    getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   // Your web app's Firebase configuration
   const firebaseConfig = {
@@ -331,9 +335,29 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 
-  // Expose (optional) for debugging / later use in non-module scripts
-  window.firebaseApp = app;
-  window.firebaseAnalytics = analytics;
+  // Auth + Firestore
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Expose for non-module scripts (your main app script below)
+  window.__fb = {
+    app,
+    analytics,
+    auth,
+    db,
+    fs: { doc, setDoc, getDoc, onSnapshot, serverTimestamp }
+  };
+
+  // Sign in anonymously (gives every visitor a stable uid)
+  window.__fbReady = (async () => {
+    try {
+      await signInAnonymously(auth);
+      console.log("[Firebase] Signed in anonymously:", auth.currentUser?.uid);
+    } catch (e) {
+      console.warn("[Firebase] Anonymous sign-in failed (Firestore features disabled):", e);
+    }
+    return window.__fb;
+  })();
 </script>
 
 <script>
@@ -444,6 +468,63 @@ Vasta küsimustele järjest: kui kõik vastused on õiged, avaneb järgmine teem
   const esc = (s) => String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
     .replaceAll('"',"&quot;").replaceAll("'","&#039;");
 
+  // --- Firebase helpers (optional) ---
+  function fb(){ return window.__fb || null; }
+  function fbUid(){ return fb()?.auth?.currentUser?.uid || null; }
+
+  function pushProgressToFirestore(){
+    const f = fb();
+    const uid = fbUid();
+    if(!f || !uid) return;
+
+    const doneCount = Array.from(state.done).filter(id => id !== "final").length;
+    const totalStages = STAGES.filter(s => s.id !== "final").length;
+    const pct = Math.round((doneCount / Math.max(1,totalStages)) * 100);
+
+    // fire-and-forget (don’t block UI)
+    f.fs.setDoc(f.fs.doc(f.db, "users", uid), {
+      currentStage: state.currentStage,
+      doneCount,
+      totalStages,
+      pct,
+      score: state.score,
+      hintsUsed: state.hintsUsed,
+      checks: state.checks,
+      updatedAt: f.fs.serverTimestamp(),
+    }, { merge: true }).catch((e) => {
+      console.warn("[Firebase] progress write failed:", e);
+    });
+  }
+
+  function listenGlobalReset(){
+    const f = fb();
+    const uid = fbUid();
+    if(!f || !uid) return;
+
+    const globalRef = f.fs.doc(f.db, "settings", "global");
+
+    f.fs.onSnapshot(globalRef, (snap) => {
+      const data = snap.data ? snap.data() : null;
+      const rv = (data && typeof data.resetVersion === "number") ? data.resetVersion : 0;
+
+      const seen = Number(localStorage.getItem("resetSeen") || "0");
+      if(rv > seen){
+        // global reset triggered
+        reset();
+        localStorage.setItem("resetSeen", String(rv));
+
+        // mark that this user has seen the reset (helpful for admin later)
+        f.fs.setDoc(f.fs.doc(f.db, "users", uid), {
+          resetSeen: rv,
+          updatedAt: f.fs.serverTimestamp(),
+        }, { merge: true }).catch(() => {});
+      }
+    }, (err) => {
+      console.warn("[Firebase] reset listener error:", err);
+    });
+  }
+
+
   function stageById(id){ return STAGES.find(s => s.id === id); }
   function stageIndex(id){ return STAGES.findIndex(s => s.id === id); }
   function nextStageId(id){ const i = stageIndex(id); return STAGES[i+1] ? STAGES[i+1].id : null; }
@@ -469,6 +550,7 @@ Vasta küsimustele järjest: kui kõik vastused on õiged, avaneb järgmine teem
       checks: state.checks,
       startTime: state.startTime
     }));
+    pushProgressToFirestore();
   }
   function load(){
     try{
@@ -494,6 +576,7 @@ Vasta küsimustele järjest: kui kõik vastused on õiged, avaneb järgmine teem
     state.checks=0;
     state.startTime=Date.now();
     renderAll();
+    pushProgressToFirestore();
   }
 
   function renderNav(){
@@ -880,6 +963,14 @@ Vasta küsimustele järjest: kui kõik vastused on õiged, avaneb järgmine teem
   // init
   load();
   state.unlocked.add("intro");
+
+  // When Firebase is ready, start listening for global reset and push current progress
+  if(window.__fbReady && typeof window.__fbReady.then === "function"){
+    window.__fbReady.then(() => {
+      listenGlobalReset();
+      pushProgressToFirestore();
+    });
+  }
 
   if(!stageById(state.currentStage) || !state.unlocked.has(state.currentStage)){
     state.currentStage = "intro";
