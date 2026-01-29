@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="et">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin & Management</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --muted: #9db1d4;
+      --text: #eaf1ff;
+      --border: rgba(255,255,255,.10);
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+      --focus: 0 0 0 3px rgba(59,130,246,.25);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background: radial-gradient(900px 600px at 15% 10%, rgba(59,130,246,.18), transparent 55%),
+                  radial-gradient(900px 600px at 85% 30%, rgba(148,163,184,.10), transparent 55%),
+                  linear-gradient(180deg, #070b14, var(--bg));
+    }
+    .container{max-width:1200px;margin:0 auto;padding:24px 16px 40px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+    .title{display:flex;flex-direction:column;gap:4px}
+    h1{margin:0;font-size:18px;letter-spacing:.2px}
+    .subtitle{color:var(--muted);font-size:13px;line-height:1.45}
+    .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+    .btn{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .btn:hover{background: rgba(255,255,255,.06)}
+    .btn:focus-visible{outline:none;box-shadow:var(--focus)}
+    .btn.primary{background: rgba(59,130,246,.18); border-color: rgba(59,130,246,.35)}
+    .btn.primary:hover{background: rgba(59,130,246,.26)}
+    .btn.danger{background: rgba(239,68,68,.16); border-color: rgba(239,68,68,.35)}
+    .btn.danger:hover{background: rgba(239,68,68,.24)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+
+    .grid{display:grid;grid-template-columns: 1fr;gap:14px}
+    @media (min-width: 980px){.grid{grid-template-columns: 360px 1fr}}
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid var(--border);
+      border-radius:14px;
+      box-shadow: var(--shadow);
+      padding:14px;
+    }
+
+    .kpis{display:grid;grid-template-columns: repeat(3, minmax(0,1fr));gap:10px}
+    @media (max-width: 640px){.kpis{grid-template-columns: 1fr}}
+    .kpi{
+      background: rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px;
+    }
+    .kpi .k{color:var(--muted);font-size:12px}
+    .kpi .v{font-family:var(--mono);font-weight:800;font-size:18px;margin-top:6px}
+
+    label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
+    input{
+      width:100%;
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--border);
+      color: var(--text);
+      border-radius:10px;
+      padding:10px 10px;
+      outline:none;
+    }
+    input:focus{box-shadow:var(--focus);border-color: rgba(59,130,246,.35)}
+
+    .hint{color:var(--muted);font-size:12px;line-height:1.45}
+    .mono{font-family:var(--mono)}
+
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    th{text-align:left;color:var(--muted);font-size:12px;font-weight:800;padding:0 10px 6px}
+    td{
+      padding:10px;
+      background: rgba(255,255,255,.03);
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      font-size:13px;
+    }
+    tr td:first-child{border-left:1px solid var(--border);border-top-left-radius:10px;border-bottom-left-radius:10px}
+    tr td:last-child{border-right:1px solid var(--border);border-top-right-radius:10px;border-bottom-right-radius:10px}
+    .badge{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--border);border-radius:999px;padding:4px 8px;font-family:var(--mono);font-size:12px;background: rgba(255,255,255,.03)}
+    .dot{width:8px;height:8px;border-radius:999px;background: rgba(255,255,255,.35)}
+    .ok .dot{background:#22c55e}
+    .now .dot{background:#3b82f6}
+    .warn .dot{background:#f59e0b}
+    .bad .dot{background:#ef4444}
+
+    .toast{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      display:none;
+    }
+    .toast.good{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10); color: rgba(209,255,231,.92)}
+    .toast.bad{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.10); color: rgba(255,221,226,.94)}
+
+    .gate{
+      min-height: calc(100vh - 80px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .loginCard{
+      width: min(460px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid var(--border);
+      border-radius:14px;
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .loginCard h2{margin:0 0 6px;font-size:16px}
+    .hidden{display:none !important}
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <section id="loginView" class="gate">
+      <div class="loginCard">
+        <h2>Admin login</h2>
+        <div class="hint">Sisesta email ja parool (Firebase Authentication → Email/Password).</div>
+
+        <div id="toastLogin" class="toast"></div>
+
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="kait@veskimae.com" autocomplete="username" />
+        <label for="password">Parool</label>
+        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap">
+          <button class="btn primary" id="loginBtn">Logi sisse</button>
+        </div>
+
+        <div class="hint" style="margin-top:10px">
+          NB: Leht võib olla avalik (GitHub Pages), aga andmete kaitse tuleb Firestore reeglitest.
+        </div>
+      </div>
+    </section>
+
+    <section id="appView" class="hidden">
+      <div class="topbar">
+        <div class="title">
+          <h1>Admin & Management</h1>
+          <div class="subtitle">Kasutajate progress ja “Reset all” (Firestore: <span class="mono">users</span>, <span class="mono">settings/global</span>).</div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="signOutBtn">Logi välja</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <aside class="panel">
+          <div class="kpis">
+            <div class="kpi">
+              <div class="k">Kasutajaid</div>
+              <div class="v" id="userCount">—</div>
+            </div>
+            <div class="kpi">
+              <div class="k">Aktiivseid (24h)</div>
+              <div class="v" id="active24h">—</div>
+            </div>
+            <div class="kpi">
+              <div class="k">resetVersion</div>
+              <div class="v" id="resetVersionLabel">—</div>
+            </div>
+          </div>
+
+          <div id="toastApp" class="toast"></div>
+
+          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap">
+            <button class="btn danger" id="resetAllBtn">Reset kõigile</button>
+            <button class="btn" id="refreshBtn">Uuenda</button>
+          </div>
+
+          <div class="hint" style="margin-top:10px">
+            “Reset kõigile” tõstab <span class="mono">settings/global.resetVersion</span>-it — kliendid resetivad ennast automaatselt.
+          </div>
+        </aside>
+
+        <main class="panel">
+          <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:10px; flex-wrap:wrap">
+            <div>
+              <div style="font-weight:800">Kasutajad</div>
+              <div class="hint">Progress = % (doneCount / totalStages) + currentStage</div>
+            </div>
+            <div class="hint" id="whoami"></div>
+          </div>
+
+          <div style="overflow:auto; margin-top:10px">
+            <table>
+              <thead>
+                <tr>
+                  <th>UID</th>
+                  <th>Progress</th>
+                  <th>Plokk</th>
+                  <th>Skoor</th>
+                  <th>Vihjed</th>
+                  <th>Viimati aktiivne</th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr><td colspan="6" class="hint">Logi sisse, et näha kasutajaid.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="hint" id="hintBottom" style="margin-top:8px"></div>
+        </main>
+      </div>
+    </section>
+
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import {
+    getFirestore, collection, query, orderBy, onSnapshot,
+    doc, runTransaction, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDC5dL8KQTceIJwIYunG1d3ED2rAsQjoxU",
+    authDomain: "romantism-5c812.firebaseapp.com",
+    projectId: "romantism-5c812",
+    storageBucket: "romantism-5c812.firebasestorage.app",
+    messagingSenderId: "248292294888",
+    appId: "1:248292294888:web:94966a3a28bc23f1f4095d",
+    measurementId: "G-CPCC26JCMW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const $ = (s, el=document) => el.querySelector(s);
+
+  function toast(which, kind, msg){
+    const t = which === "login" ? $("#toastLogin") : $("#toastApp");
+    t.className = "toast " + (kind || "");
+    t.textContent = msg;
+    t.style.display = "block";
+    setTimeout(() => { t.style.display = "none"; }, 4500);
+  }
+
+  const loginView = $("#loginView");
+  const appView = $("#appView");
+
+  function showLogin(){
+    appView.classList.add("hidden");
+    loginView.classList.remove("hidden");
+  }
+  function showApp(){
+    loginView.classList.add("hidden");
+    appView.classList.remove("hidden");
+  }
+
+  const fmtTime = (ts) => {
+    if(!ts) return "—";
+    try{
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleString();
+    }catch(e){ return "—"; }
+  };
+
+  const globalRef = doc(db, "settings", "global");
+
+  let unsubUsers = null;
+  let unsubGlobal = null;
+
+  function renderUsers(rows){
+    const tbody = $("#tbody");
+    tbody.innerHTML = "";
+    if(rows.length === 0){
+      tbody.innerHTML = `<tr><td colspan="6" class="hint">Pole veel ühtegi kasutajat (või pole keegi veel salvestanud).</td></tr>`;
+      $("#userCount").textContent = "0";
+      $("#active24h").textContent = "0";
+      $("#hintBottom").textContent = "";
+      return;
+    }
+
+    $("#userCount").textContent = String(rows.length);
+    const now = Date.now();
+    const active = rows.filter(r => {
+      const ts = r.updatedAt?.toDate ? r.updatedAt.toDate().getTime() : 0;
+      return ts && (now - ts) <= 24*60*60*1000;
+    }).length;
+    $("#active24h").textContent = String(active);
+
+    for(const r of rows){
+      const pct = (typeof r.pct === "number") ? r.pct : null;
+      const doneCount = (typeof r.doneCount === "number") ? r.doneCount : null;
+      const total = (typeof r.totalStages === "number") ? r.totalStages : null;
+
+      let badgeClass = "warn";
+      if(pct === 100) badgeClass = "ok";
+      else if(pct !== null && pct >= 60) badgeClass = "now";
+      else if(pct !== null && pct < 20) badgeClass = "bad";
+
+      const progressText =
+        pct === null ? "—" :
+        `${pct}%` + (doneCount !== null && total !== null ? ` (${doneCount}/${total})` : "");
+
+      const uidShort = r.uid.length > 10 ? (r.uid.slice(0,6) + "…" + r.uid.slice(-4)) : r.uid;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td title="${r.uid}" class="mono">${uidShort}</td>
+        <td><span class="badge ${badgeClass}"><span class="dot"></span>${progressText}</span></td>
+        <td class="mono">${r.currentStage || "—"}</td>
+        <td class="mono">${(typeof r.score === "number") ? r.score : "—"}</td>
+        <td class="mono">${(typeof r.hintsUsed === "number") ? r.hintsUsed : "—"}</td>
+        <td>${fmtTime(r.updatedAt)}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    $("#hintBottom").textContent = `Kokku ${rows.length} kasutajat. (Uuendub reaalajas.)`;
+  }
+
+  function subscribeUsers(){
+    if(unsubUsers) unsubUsers();
+    const q = query(collection(db, "users"), orderBy("updatedAt", "desc"));
+    unsubUsers = onSnapshot(q, (snap) => {
+      const rows = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+      renderUsers(rows);
+    }, (err) => {
+      console.error(err);
+      toast("app", "bad", "Ei saanud users collectionit lugeda (puudub ligipääs).");
+      $("#tbody").innerHTML = `<tr><td colspan="6" class="hint">Viga: puudub ligipääs users andmetele. Vaata Console'i.</td></tr>`;
+    });
+  }
+
+  function subscribeGlobal(){
+    if(unsubGlobal) unsubGlobal();
+    unsubGlobal = onSnapshot(globalRef, (snap) => {
+      const rv = snap.data()?.resetVersion ?? 0;
+      $("#resetVersionLabel").textContent = String(rv);
+    }, (err) => {
+      console.error(err);
+      toast("app", "bad", "Ei saanud settings/global lugeda (puudub ligipääs).");
+    });
+  }
+
+  async function doResetAll(){
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(globalRef);
+      const current = snap.exists() ? (snap.data().resetVersion ?? 0) : 0;
+      tx.set(globalRef, { resetVersion: current + 1, updatedAt: serverTimestamp() }, { merge: true });
+    });
+    toast("app", "good", "Reset saadetud. Kliendid resetivad ennast automaatselt.");
+  }
+
+  $("#loginBtn").addEventListener("click", async () => {
+    const email = $("#email").value.trim();
+    const pass = $("#password").value;
+    try{
+      await signInWithEmailAndPassword(auth, email, pass);
+      toast("login", "good", "Sisselogitud.");
+    }catch(e){
+      console.error(e);
+      toast("login", "bad", e?.message || "Sisselogimine ebaõnnestus.");
+    }
+  });
+
+  $("#signOutBtn").addEventListener("click", async () => {
+    try{ await signOut(auth); }catch(e){ console.error(e); }
+  });
+
+  $("#resetAllBtn").addEventListener("click", async () => {
+    const ok = confirm("Kas teed reseti KÕIGILE kasutajatele?");
+    if(!ok) return;
+    $("#resetAllBtn").disabled = true;
+    try{
+      await doResetAll();
+    }catch(e){
+      console.error(e);
+      toast("app", "bad", e?.message || "Reset ebaõnnestus.");
+    }finally{
+      $("#resetAllBtn").disabled = false;
+    }
+  });
+
+  $("#refreshBtn").addEventListener("click", () => subscribeUsers());
+
+  onAuthStateChanged(auth, (user) => {
+    if(!user){
+      $("#whoami").textContent = "";
+      showLogin();
+      if(unsubUsers){ unsubUsers(); unsubUsers=null; }
+      if(unsubGlobal){ unsubGlobal(); unsubGlobal=null; }
+      return;
+    }
+
+    showApp();
+    $("#whoami").textContent = `Sisse logitud: ${user.email || user.uid}`;
+    subscribeGlobal();
+    subscribeUsers();
+  });
+
+  showLogin();
+</script>
+</body>
+</html>
